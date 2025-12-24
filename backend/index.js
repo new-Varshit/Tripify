@@ -28,7 +28,9 @@ connectDB();
 
 app.use(
   cors({
-    origin: process.env.SERVER_URL,
+    origin: [process.env.SERVER_URL,
+       "https://tripify-kappa.vercel.app"
+    ],
     credentials: true,
   })
 );
