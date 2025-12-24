@@ -8,6 +8,7 @@ import {
 } from "../redux/user/userSlice.js";
 import { useDispatch, useSelector } from "react-redux";
 import loginImage from "../assets/images/login.png";
+import { apiFetch } from "../services/api.js";
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -27,7 +28,7 @@ const Login = () => {
     e.preventDefault();
     try {
       dispatch(loginStart());
-      const res = await fetch(`/api/auth/login`, {
+      const res = await apiFetch(`/api/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

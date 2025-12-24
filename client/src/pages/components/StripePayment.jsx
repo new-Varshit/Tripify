@@ -1,5 +1,5 @@
 import React from "react";
-
+import { apiFetch } from "../../services/api";
 const StripePayment = ({ handleBookPackage }) => {
   const handleStripe = async () => {
     handleBookPackage();
@@ -12,7 +12,7 @@ const StripePayment = ({ handleBookPackage }) => {
         return;
       }
       console.log(bookingData);
-      const res = await fetch("http://localhost:8000/payment/create-payment", {
+      const res = await apiFetch("http://localhost:8000/payment/create-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
+import { apiFetch } from "../../services/api";
 
 const Payments = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -12,7 +13,7 @@ const Payments = () => {
   const getAllBookings = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
+      const res = await apiFetch(
         `/api/booking/get-allBookings?searchTerm=${search}`
       );
       const data = await res.json();

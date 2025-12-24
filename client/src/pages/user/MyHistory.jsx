@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
+import { apiFetch } from "../../services/api";
 
 const MyHistory = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -13,7 +14,7 @@ const MyHistory = () => {
   const getAllBookings = async () => {
     try {
       setLoading(true);
-      const res = await fetch(
+      const res = await apiFetch(
         `/api/booking/get-allUserBookings/${currentUser?._id}?searchTerm=${search}`
       );
       const data = await res.json();
@@ -37,7 +38,7 @@ const MyHistory = () => {
   const handleHistoryDelete = async (id) => {
     try {
       setLoading(true);
-      const res = await fetch(
+      const res = await apiFetch(
         `/api/booking/delete-booking-history/${id}/${currentUser._id}`,
         {
           method: "DELETE",

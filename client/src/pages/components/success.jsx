@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { apiFetch } from "../../services/api";
 
 const Success = () => {
   const { t } = useTranslation();
@@ -19,11 +20,10 @@ const Success = () => {
       }
 
       try {
-        const res = await fetch(
-          `http://localhost:8000/api/booking/book-package/${bookingData.packageDetails}`,
+        const res = await apiFetch(
+          `/api/booking/book-package/${bookingData.packageDetails}`,
           {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
             credentials: "include",
             body: JSON.stringify(bookingData),
           }

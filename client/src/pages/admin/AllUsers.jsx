@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { toast } from "react-toastify";
-
+import { apiFetch } from "../../services/api";
 const AllUsers = () => {
   const [allUser, setAllUsers] = useState([]);
   const [search, setSearch] = useState("");
@@ -12,7 +12,7 @@ const AllUsers = () => {
   const getUsers = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/user/getAllUsers?searchTerm=${search}`);
+      const res = await apiFetch(`/api/user/getAllUsers?searchTerm=${search}`);
       const data = await res.json();
 
       if (data && data?.success === false) {
@@ -39,7 +39,7 @@ const AllUsers = () => {
     if (CONFIRM) {
       setLoading(true);
       try {
-        const res = await fetch(`/api/user/delete-user/${userId}`, {
+        const res = await apiFetch(`/api/user/delete-user/${userId}`, {
           method: "DELETE",
         });
         const data = await res.json();

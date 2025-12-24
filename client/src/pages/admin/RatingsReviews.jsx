@@ -1,6 +1,7 @@
 import { Rating } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { apiFetch } from "../../services/api";
 
 const RatingsReviews = () => {
   const [packages, setPackages] = useState([]);
@@ -17,7 +18,7 @@ const RatingsReviews = () => {
         filter === "most" //most rated
           ? `/api/package/get-packages?searchTerm=${search}&sort=packageTotalRatings`
           : `/api/package/get-packages?searchTerm=${search}&sort=packageRating`; //all
-      const res = await fetch(url);
+      const res = await apiFetch(url);
       const data = await res.json();
       if (data?.success) {
         setPackages(data?.packages);
@@ -47,7 +48,7 @@ const RatingsReviews = () => {
       filter === "most" //most rated
         ? `/api/package/get-packages?searchTerm=${search}&sort=packageTotalRatings&startIndex=${startIndex}`
         : `/api/package/get-packages?searchTerm=${search}&sort=packageRating&startIndex=${startIndex}`; //all
-    const res = await fetch(url);
+    const res = await apiFetch(url);
     const data = await res.json();
     if (data?.packages?.length < 9) {
       setShowMoreBtn(false);

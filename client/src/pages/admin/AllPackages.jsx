@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-
+import { apiFetch } from "../../services/api";
 const AllPackages = () => {
   const [packages, setPackages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -21,7 +21,7 @@ const AllPackages = () => {
           : filter === "top" //top rated
           ? `/api/package/get-packages?searchTerm=${search}&sort=packageRating`
           : `/api/package/get-packages?searchTerm=${search}`; //all
-      const res = await fetch(url);
+      const res = await apiFetch(url);
       const data = await res.json();
       if (data?.success) {
         setPackages(data?.packages);
@@ -51,7 +51,7 @@ const AllPackages = () => {
         : filter === "top" //top rated
         ? `/api/package/get-packages?searchTerm=${search}&sort=packageRating&startIndex=${startIndex}`
         : `/api/package/get-packages?searchTerm=${search}&startIndex=${startIndex}`; //all
-    const res = await fetch(url);
+    const res = await apiFetch(url);
     const data = await res.json();
     if (data?.packages?.length < 9) {
       setShowMoreBtn(false);
@@ -66,7 +66,7 @@ const AllPackages = () => {
   const handleDelete = async (packageId) => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/package/delete-package/${packageId}`, {
+      const res = await apiFetch(`/api/package/delete-package/${packageId}`, {
         method: "DELETE",
       });
       const data = await res.json();

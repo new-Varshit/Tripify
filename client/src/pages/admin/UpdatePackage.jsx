@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import { apiFetch } from "../../services/api";
 
 const UpdatePackage = () => {
   const { t } = useTranslation();
@@ -29,7 +30,7 @@ const UpdatePackage = () => {
 
   const getPackageData = async () => {
     try {
-      const res = await fetch(`/api/package/get-package-data/${params?.id}`);
+      const res = await apiFetch(`/api/package/get-package-data/${params?.id}`);
       const data = await res.json();
 
       if (data?.success) {
@@ -114,7 +115,7 @@ const UpdatePackage = () => {
         form.append("packageImages", img);
       });
 
-      const res = await fetch(`/api/package/update-package/${params?.id}`, {
+      const res = await apiFetch(`/api/package/update-package/${params?.id}`, {
         method: "POST",
         body: form,
       });

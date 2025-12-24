@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Chart from "../components/Chart";
+import { apiFetch } from "../../services/api";
 
 const AllBookings = () => {
   const { currentUser } = useSelector((state) => state.user);
@@ -14,7 +15,7 @@ const AllBookings = () => {
     setCurrentBookings([]);
     try {
       setLoading(true);
-      const res = await fetch(
+      const res = await apiFetch(
         `/api/booking/get-currentBookings?searchTerm=${searchTerm}`
       );
       const data = await res.json();
@@ -38,7 +39,7 @@ const AllBookings = () => {
   const handleCancel = async (id) => {
     try {
       setLoading(true);
-      const res = await fetch(
+      const res = await apiFetch(
         `/api/booking/cancel-booking/${id}/${currentUser._id}`,
         {
           method: "POST",

@@ -13,6 +13,7 @@ import SingleCard from "./components/SingleCard";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { apiFetch } from "../services/api";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const Home = () => {
   const getTopPackages = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(
+      const res = await apiFetch(
         "/api/package/get-packages?sort=packageRating&limit=8"
       );
       const data = await res.json();
@@ -44,7 +45,7 @@ const Home = () => {
   const getLatestPackages = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(
+      const res = await apiFetch(
         "/api/package/get-packages?sort=createdAt&limit=8"
       );
       const data = await res.json();
@@ -63,7 +64,7 @@ const Home = () => {
   const getOfferPackages = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(
+      const res = await apiFetch(
         "/api/package/get-packages?sort=createdAt&offer=true&limit=6"
       );
       const data = await res.json();

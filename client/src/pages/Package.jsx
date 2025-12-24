@@ -12,6 +12,7 @@ import MapModal from "./components/MapModal";
 import { Autoplay } from "swiper/modules";
 import { FaClock } from "react-icons/fa";
 import { useTranslation } from "react-i18next";
+import { apiFetch } from "../services/api";
 
 const Package = () => {
   const { t } = useTranslation();
@@ -59,7 +60,7 @@ const Package = () => {
   const getPackageData = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/package/get-package-data/${params?.id}`);
+      const res = await apiFetch(`/api/package/get-package-data/${params?.id}`);
       const data = await res.json();
 
       if (data?.success) {
@@ -104,7 +105,7 @@ const Package = () => {
     try {
       setLoading(true);
 
-      const res = await fetch("/api/rating/give-rating", {
+      const res = await apiFetch("/api/rating/give-rating", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(ratingsData),
@@ -129,7 +130,7 @@ const Package = () => {
 
   const getRatings = async () => {
     try {
-      const res = await fetch(`/api/rating/get-ratings/${params.id}/4`);
+      const res = await apiFetch(`/api/rating/get-ratings/${params.id}/4`);
       const data = await res.json();
       setPackageRatings(data || []);
     } catch (e) {
@@ -139,7 +140,7 @@ const Package = () => {
 
   const checkRatingGiven = async () => {
     try {
-      const res = await fetch(
+      const res = await apiFetch(
         `/api/rating/rating-given/${currentUser?._id}/${params?.id}`
       );
       const data = await res.json();

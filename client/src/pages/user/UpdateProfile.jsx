@@ -11,6 +11,7 @@ import {
 import { toast } from "react-toastify";
 import axios from "axios";
 import { FiUpload } from "react-icons/fi";
+import { apiFetch } from "../../services/api";
 
 const UpdateProfile = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -129,7 +130,7 @@ const UpdateProfile = () => {
     }
     try {
       dispatch(updatePassStart());
-      const res = await fetch(`/api/user/update-password/${currentUser._id}`, {
+      const res = await apiFetch(`/api/user/update-password/${currentUser._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

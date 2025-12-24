@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import Map from "../components/Map";
 import StripePayment from "../components/StripePayment";
 import { useTranslation } from "react-i18next";
+import { apiFetch } from "../../services/api";
 
 const Booking = () => {
   const { t } = useTranslation();
@@ -53,7 +54,7 @@ const Booking = () => {
   const getPackageData = async () => {
     try {
       setLoading(true);
-      const res = await fetch(`/api/package/get-package-data/${params?.packageId}`);
+      const res = await apiFetch(`/api/package/get-package-data/${params?.packageId}`);
       const data = await res.json();
 
       if (data?.success) {

@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { FiUpload } from "react-icons/fi";
 import { useTranslation } from "react-i18next";
+import { apiFetch } from "../../services/api";
 
 const AdminUpdateProfile = () => {
   const { t } = useTranslation();
@@ -135,7 +136,7 @@ const AdminUpdateProfile = () => {
     try {
       dispatch(updatePassStart());
 
-      const res = await fetch(
+      const res = await apiFetch(
         `/api/user/update-password/${currentUser._id}`,
         {
           method: "POST",
