@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
+
 const UpdatePackage = () => {
+  const { t } = useTranslation();
   const params = useParams();
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     packageName: "",
     packageDescription: "",
@@ -27,30 +31,31 @@ const UpdatePackage = () => {
     try {
       const res = await fetch(`/api/package/get-package-data/${params?.id}`);
       const data = await res.json();
+
       if (data?.success) {
-        // console.log(data);
         setFormData({
-          packageName: data?.packageData?.packageName,
-          packageDescription: data?.packageData?.packageDescription,
-          packageDestination: data?.packageData?.packageDestination,
-          packageDays: data?.packageData?.packageDays,
-          packageNights: data?.packageData?.packageNights,
-          packageAccommodation: data?.packageData?.packageAccommodation,
-          packageTransportation: data?.packageData?.packageTransportation,
-          packageMeals: data?.packageData?.packageMeals,
-          packageActivities: data?.packageData?.packageActivities,
-          packagePrice: data?.packageData?.packagePrice,
-          packageDiscountPrice: data?.packageData?.packageDiscountPrice,
-          packageOffer: data?.packageData?.packageOffer,
-          packageImages: data?.packageData?.packageImages,
+          packageName: data.packageData.packageName,
+          packageDescription: data.packageData.packageDescription,
+          packageDestination: data.packageData.packageDestination,
+          packageDays: data.packageData.packageDays,
+          packageNights: data.packageData.packageNights,
+          packageAccommodation: data.packageData.packageAccommodation,
+          packageTransportation: data.packageData.packageTransportation,
+          packageMeals: data.packageData.packageMeals,
+          packageActivities: data.packageData.packageActivities,
+          packagePrice: data.packageData.packagePrice,
+          packageDiscountPrice: data.packageData.packageDiscountPrice,
+          packageOffer: data.packageData.packageOffer,
+          packageImages: data.packageData.packageImages,
         });
       } else {
-        toast.error(data?.message || "Something went wrong!");
+        toast.error(t("admin.updatePackage.errors.somethingWrong"));
       }
     } catch (error) {
       console.log(error);
     }
   };
+
   useEffect(() => {
     if (params.id) getPackageData();
   }, [params.id]);
@@ -62,50 +67,35 @@ const UpdatePackage = () => {
     }
   };
 
-  const handleFile = (e) => {
-    const selectedFiles = Array.from(e.target.files);
-    const totalImages =
-      selectedFiles.length + images.length + formData.packageImages.length;
-
-    if (totalImages > 10) {
-      toast.error("You can only upload 10 images per package");
-      return;
-    }
-    setImages((prev) => [...prev, ...selectedFiles]);
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (formData.packageImages.length === 0) {
-      toast.error("You must upload at least 1 image");
+      toast.error(t("admin.updatePackage.errors.noImage"));
       return;
     }
 
     if (
-      formData.packageName === "" ||
-      formData.packageDescription === "" ||
-      formData.packageDestination === "" ||
-      formData.packageAccommodation === "" ||
-      formData.packageTransportation === "" ||
-      formData.packageMeals === "" ||
-      formData.packageActivities === "" ||
+      !formData.packageName ||
+      !formData.packageDescription ||
+      !formData.packageDestination ||
+      !formData.packageAccommodation ||
+      !formData.packageTransportation ||
+      !formData.packageMeals ||
+      !formData.packageActivities ||
       formData.packagePrice === 0
     ) {
-      toast.error("All fields are required!");
+      toast.error(t("admin.updatePackage.errors.allRequired"));
       return;
     }
 
     if (formData.packagePrice < 500) {
-      toast.error("Price should be greater than 500!");
+      toast.error(t("admin.updatePackage.errors.priceMin"));
       return;
     }
 
-    if (
-      formData.packageOffer &&
-      formData.packageDiscountPrice >= formData.packagePrice
-    ) {
-      toast.error("Regular Price should be greater than Discount Price!");
+    if (formData.packageOffer && formData.packageDiscountPrice >= formData.packagePrice) {
+      toast.error(t("admin.updatePackage.errors.discountLess"));
       return;
     }
 
@@ -114,21 +104,18 @@ const UpdatePackage = () => {
       setError(false);
 
       const form = new FormData();
-
-      // Append non-file fields
       Object.entries(formData).forEach(([key, value]) => {
         if (key !== "packageImages") {
           form.append(key, value);
         }
       });
 
-      // Append file objects
-      formData.packageImages.forEach((image) => {
-        form.append("packageImages", image); // Must match Multer field name
+      formData.packageImages.forEach((img) => {
+        form.append("packageImages", img);
       });
 
       const res = await fetch(`/api/package/update-package/${params?.id}`, {
-        method: "POST", // or POST if you prefer
+        method: "POST",
         body: form,
       });
 
@@ -137,7 +124,7 @@ const UpdatePackage = () => {
       if (data?.success === false) {
         setError(data?.message);
       } else {
-        toast.success(data?.message || "Package updated successfully!");
+        toast.success(t("admin.updatePackage.success.updated"));
         navigate(`/package/${params?.id}`);
       }
 
@@ -145,21 +132,22 @@ const UpdatePackage = () => {
     } catch (err) {
       console.log(err);
       setLoading(false);
-      setError("Something went wrong!");
+      setError(t("admin.updatePackage.errors.somethingWrong"));
     }
   };
 
   return (
     <>
       <div className="w-full flex flex-wrap justify-center gap-2 p-6">
-        <form
-          onSubmit={handleSubmit}
-          className="w-full sm:w-[60%] space-y-4 shadow-md rounded-xl p-4 bg-white"
-        >
-          <h1 className="text-center text-2xl font-semibold">Update Package</h1>
+
+        <form onSubmit={handleSubmit} className="w-full sm:w-[60%] space-y-4 shadow-md rounded-xl p-4 bg-white">
+
+          <h1 className="text-center text-2xl font-semibold">
+            {t("admin.updatePackage.heading")}
+          </h1>
 
           <div>
-            <label className="font-medium">Name</label>
+            <label className="font-medium">{t("admin.updatePackage.fields.name")}</label>
             <input
               type="text"
               id="packageName"
@@ -170,17 +158,17 @@ const UpdatePackage = () => {
           </div>
 
           <div>
-            <label className="font-medium">Description</label>
+            <label className="font-medium">{t("admin.updatePackage.fields.description")}</label>
             <textarea
               id="packageDescription"
               value={formData.packageDescription}
               onChange={handleChange}
-              className="w-full mt-2 p-3 border rounded-md bg-gray-200 outline-none "
+              className="w-full mt-2 p-3 border rounded-md bg-gray-200 outline-none"
             />
           </div>
 
           <div>
-            <label className="font-medium">Destination</label>
+            <label className="font-medium">{t("admin.updatePackage.fields.destination")}</label>
             <input
               type="text"
               id="packageDestination"
@@ -192,7 +180,7 @@ const UpdatePackage = () => {
 
           <div className="flex flex-wrap gap-4">
             <div className="flex-1">
-              <label className="font-medium">Days</label>
+              <label className="font-medium">{t("admin.updatePackage.fields.days")}</label>
               <input
                 type="number"
                 id="packageDays"
@@ -201,8 +189,9 @@ const UpdatePackage = () => {
                 className="w-full mt-2 p-3 border rounded-md bg-gray-200 outline-none"
               />
             </div>
+
             <div className="flex-1">
-              <label className="font-medium">Nights</label>
+              <label className="font-medium">{t("admin.updatePackage.fields.nights")}</label>
               <input
                 type="number"
                 id="packageNights"
@@ -214,35 +203,36 @@ const UpdatePackage = () => {
           </div>
 
           <div>
-            <label className="font-medium">Accommodation</label>
+            <label className="font-medium">{t("admin.updatePackage.fields.accommodation")}</label>
             <textarea
               id="packageAccommodation"
               value={formData.packageAccommodation}
               onChange={handleChange}
-              className="w-full mt-2 p-3 border rounded-md bg-gray-200 outline-none "
+              className="w-full mt-2 p-3 border rounded-md bg-gray-200 outline-none"
             />
           </div>
 
           <div>
             <label className="font-medium">
-              Transportation (Selected: {formData?.packageTransportation})
+              {t("admin.updatePackage.fields.transportation")} ({t("admin.updatePackage.selected")}: {formData.packageTransportation})
             </label>
+
             <select
               id="packageTransportation"
               value={formData.packageTransportation}
               onChange={handleChange}
               className="w-full mt-2 p-3 border rounded-md bg-gray-200 outline-none"
             >
-              <option value="">Select</option>
-              <option value="Flight">Flight</option>
-              <option value="Train">Train</option>
-              <option value="Boat">Boat</option>
-              <option value="Other">Other</option>
+              <option value="">{t("admin.updatePackage.options.select")}</option>
+              <option value="Flight">{t("admin.updatePackage.options.flight")}</option>
+              <option value="Train">{t("admin.updatePackage.options.train")}</option>
+              <option value="Boat">{t("admin.updatePackage.options.boat")}</option>
+              <option value="Other">{t("admin.updatePackage.options.other")}</option>
             </select>
           </div>
 
           <div>
-            <label className="font-medium">Meals</label>
+            <label className="font-medium">{t("admin.updatePackage.fields.meals")}</label>
             <textarea
               id="packageMeals"
               value={formData.packageMeals}
@@ -252,7 +242,7 @@ const UpdatePackage = () => {
           </div>
 
           <div>
-            <label className="font-medium">Activities</label>
+            <label className="font-medium">{t("admin.updatePackage.fields.activities")}</label>
             <textarea
               id="packageActivities"
               value={formData.packageActivities}
@@ -262,7 +252,7 @@ const UpdatePackage = () => {
           </div>
 
           <div>
-            <label className="font-medium">Price</label>
+            <label className="font-medium">{t("admin.updatePackage.fields.price")}</label>
             <input
               type="number"
               id="packagePrice"
@@ -274,12 +264,12 @@ const UpdatePackage = () => {
 
           <div className="flex items-center gap-2">
             <label className="font-medium" htmlFor="packageOffer">
-              Offer
+              {t("admin.updatePackage.fields.offer")}
             </label>
             <input
               type="checkbox"
               id="packageOffer"
-              checked={formData?.packageOffer}
+              checked={formData.packageOffer}
               onChange={handleChange}
               className="w-5 h-5"
             />
@@ -287,7 +277,7 @@ const UpdatePackage = () => {
 
           {formData.packageOffer && (
             <div>
-              <label className="font-medium">Discount Price</label>
+              <label className="font-medium">{t("admin.updatePackage.fields.discountPrice")}</label>
               <input
                 type="number"
                 id="packageDiscountPrice"
@@ -299,38 +289,20 @@ const UpdatePackage = () => {
           )}
 
           <button className="w-full bg-[#EB662B] text-white p-3 rounded-md hover:opacity-90 disabled:opacity-80">
-            {loading ? "Loading..." : "Update Package"}
+            {loading ? t("admin.updatePackage.actions.loading") : t("admin.updatePackage.actions.update")}
           </button>
+
         </form>
 
-        {/* Image Upload Section */}
-        <div className="w-full sm:w-[30%] space-y-4 shadow-md rounded-xl p-4 bg-white">
-          {/* <div>
-            <label className="font-medium" htmlFor="packageImages">
-              Images:
-              <span className="text-red-700 text-sm block">
-                (images size should be less than 2MB and max 10 images)
-              </span>
-            </label>
-            <input
-              type="file"
-              id="packageImages"
-              multiple
-              accept="image/*" // ✅ Optional: restrict to images only
-              onChange={handleFile} // ✅ Updated handler
-              className="w-full mt-2 p-3 border rounded-md bg-gray-200 outline-none"
-            />
-          </div> */}
 
-          {formData?.packageImages?.length > 0 && (
+        {/* Right side image preview */}
+        <div className="w-full sm:w-[30%] space-y-4 shadow-md rounded-xl p-4 bg-white">
+          {formData.packageImages.length > 0 && (
             <div className="space-y-2">
-              {formData.packageImages.map((image, i) => (
-                <div
-                  key={i}
-                  className="shadow-md rounded-md p-2 flex justify-between items-center"
-                >
+              {formData.packageImages.map((img, i) => (
+                <div key={i} className="shadow-md rounded-md p-2 flex justify-between items-center">
                   <img
-                    src={`http://localhost:8000/images/${image}`}
+                    src={`${img}`}
                     alt=""
                     className="h-20 w-20 rounded"
                   />
@@ -339,6 +311,7 @@ const UpdatePackage = () => {
             </div>
           )}
         </div>
+
       </div>
     </>
   );

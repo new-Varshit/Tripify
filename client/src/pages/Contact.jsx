@@ -1,8 +1,11 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import emailjs from "emailjs-com";
+import { useTranslation } from "react-i18next";
 
 const Contact = () => {
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     user_name: "",
     user_email: "",
@@ -15,10 +18,10 @@ const Contact = () => {
     e.preventDefault();
     emailjs
       .send(
-        "service_t7sng6h",
-        "template_0558q8s",
+        "service_lxiyfos",
+        "template_ahdm1vp",
         formData,
-        "oJc2CZ716CGc5FbjT"
+        "NEJeSDbZxdKQAhRSY"
       )
       .then(
         () => {
@@ -40,68 +43,77 @@ const Contact = () => {
         transition={{ duration: 0.6 }}
       >
         <h2 className="text-3xl font-bold mb-6 text-center text-[#EB662B]">
-          Contact Us
+          {t("contact.heading")}
         </h2>
+
         <p className="text-center mb-8">
-          We'd love to hear from you! Fill out the form below and we'll get back
-          to you shortly.
+          {t("contact.subtext")}
         </p>
+
         <form onSubmit={sendEmail} className="space-y-6">
           <div>
-            <label className="block mb-2 text-sm font-medium">Your Name</label>
+            <label className="block mb-2 text-sm font-medium">
+              {t("contact.your_name_label")}
+            </label>
             <input
               type="text"
               name="user_name"
               required
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6358DC]"
-              placeholder="Enter your name"
+              placeholder={t("contact.your_name_placeholder")}
               value={formData.user_name}
               onChange={(e) =>
                 setFormData({ ...formData, user_name: e.target.value })
               }
             />
           </div>
+
           <div>
-            <label className="block mb-2 text-sm font-medium">Your Email</label>
+            <label className="block mb-2 text-sm font-medium">
+              {t("contact.your_email_label")}
+            </label>
             <input
               type="email"
               name="user_email"
               required
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6358DC]"
-              placeholder="Enter your email"
+              placeholder={t("contact.your_email_placeholder")}
               value={formData.user_email}
               onChange={(e) =>
                 setFormData({ ...formData, user_email: e.target.value })
               }
             />
           </div>
+
           <div>
             <label className="block mb-2 text-sm font-medium">
-              Your Message
+              {t("contact.your_message_label")}
             </label>
             <textarea
               name="message"
               rows="5"
               required
               className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6358DC]"
-              placeholder="Enter your message"
+              placeholder={t("contact.your_message_placeholder")}
               value={formData.message}
               onChange={(e) =>
                 setFormData({ ...formData, message: e.target.value })
               }
             ></textarea>
           </div>
+
           <div className="text-center">
             <motion.button
               type="submit"
               whileTap={{ scale: 0.95 }}
-              className="bg-[#EB662B] text-white font-semibold px-6 py-3 rounded-lg  transition"
+              className="bg-[#EB662B] text-white font-semibold px-6 py-3 rounded-lg transition"
             >
-              Send Message
+              {t("contact.send_button")}
             </motion.button>
+
             {isSent && (
               <p className="text-green-600 font-medium mt-3">
-                Message sent successfully!
+                {t("contact.success_message")}
               </p>
             )}
           </div>

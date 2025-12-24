@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import uploadToCloudinary from "../utils/cloudinaryUpload.js";
 
 //test controller
 export const test = (req, res) => {
@@ -46,7 +47,7 @@ export const signupController = async (req, res) => {
     console.log(error);
     return res.status(500).send({
       success: false,
-      message: "Error is server!",
+      message: "Error in server!",
     });
   }
 };

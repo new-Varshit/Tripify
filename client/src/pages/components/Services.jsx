@@ -3,41 +3,43 @@ import plane from "../../assets/images/plane.png";
 import event from "../../assets/images/event.png";
 import setting from "../../assets/images/setting.png";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
+
 const Services = () => {
+  const { t } = useTranslation();
+
   const services = [
     {
       id: 1,
       image: weather,
-      title: "Calculated Weather",
-      description:
-        "Built Wicket longer admire do barton vanity itself do in it.",
+      title: t("servicesPage.services.weather.title"),
+      description: t("servicesPage.services.weather.description"),
     },
     {
       id: 2,
       image: plane,
-      title: "Best Flights ",
-      description:
-        "Engrossed listening. Park gate sell they west hard for the.",
+      title: t("servicesPage.services.flights.title"),
+      description: t("servicesPage.services.flights.description"),
     },
     {
       id: 3,
       image: event,
-      title: "Local Events",
-      description:
-        "Barton vanity itself do in it. Preferd to men it engrossed listening. ",
+      title: t("servicesPage.services.events.title"),
+      description: t("servicesPage.services.events.description"),
     },
     {
       id: 4,
       image: setting,
-      title: "Customization",
-      description:
-        "We deliver outsourced aviation services for military customers",
+      title: t("servicesPage.services.customization.title"),
+      description: t("servicesPage.services.customization.description"),
     },
   ];
+
   return (
     <div className="py-6">
+
       <h1 className="text-center text-gray-700 text-xl font-semibold">
-        CATEGORY
+        {t("servicesPage.category")}
       </h1>
 
       <div className="my-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 items-center justify-center">
@@ -69,4 +71,5 @@ const Services = () => {
     </div>
   );
 };
+
 export default Services;

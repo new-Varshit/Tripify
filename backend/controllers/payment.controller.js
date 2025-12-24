@@ -3,14 +3,14 @@ import payment from "../payment.js";
 export const paymentController = async (req, res) => {
   try {
     const { amount } = req.body;
-
+        console.log(amount);
     if (!amount) {
       return res.status(400).json({
         success: false,
         message: "Amount is required.",
       });
     }
-
+          console.log(amount);
     const result = await payment(amount);
 
     if (result.error) {
@@ -21,11 +21,11 @@ export const paymentController = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    res.status(200).json({  
       success: true,
       message: "Checkout session created successfully",
-      url: result.url, // 👈 frontend will redirect to this
-    });
+      url: result.url, 
+    });// 👈 frontend will redirect to this
   } catch (error) {
     console.error("Payment controller error:", error.message);
     res.status(500).json({

@@ -5,6 +5,8 @@ import { ObjectId } from "mongodb";
 //book package
 export const bookPackage = async (req, res) => {
   try {
+
+         console.log('you are here');
     const { packageDetails, buyer, totalPrice, persons, date } = req.body;
 
     if (req.user.id !== buyer) {
@@ -13,25 +15,31 @@ export const bookPackage = async (req, res) => {
         message: "You can only buy on your account!",
       });
     }
-
+             console.log('1');
+             console.log(req.body);
     if (!packageDetails || !buyer || !totalPrice || !persons || !date) {
       return res.status(200).send({
         success: false,
         message: "All fields are required!",
       });
-    }
+    } 
+
+                 console.log('2');
+
 
     const validPackage = await Package.findById(packageDetails);
-
     if (!validPackage) {
       return res.status(404).send({
         success: false,
         message: "Package Not Found!",
       });
     }
+            
+                   
+
 
     const newBooking = await Booking.create(req.body);
-
+            console.log('new booking' , newBooking);
     if (newBooking) {
       return res.status(201).send({
         success: true,

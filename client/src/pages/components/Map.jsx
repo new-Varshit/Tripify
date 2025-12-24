@@ -6,12 +6,16 @@ import { calculateDistance } from "../../utils/distanceCalc";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
-const Map = ({ destinationName }) => {
-  const [latLng, setLatLng] = useState(null); // destination location
-  const [userLocation, setUserLocation] = useState(null); // user location
-  const [distance, setDistance] = useState(null); // distance
+import { useTranslation } from "react-i18next";
 
-  // Get destination coordinates
+const Map = ({ destinationName }) => {
+  const { t } = useTranslation();
+
+  const [latLng, setLatLng] = useState(null);
+  const [userLocation, setUserLocation] = useState(null);
+  const [distance, setDistance] = useState(null);
+
+  // Fetch destination coordinates
   useEffect(() => {
     const fetchDestinationLatLng = async () => {
       const coordinates = await getLatLng(destinationName);
@@ -23,24 +27,22 @@ const Map = ({ destinationName }) => {
     }
   }, [destinationName]);
 
-  // Get user location
+  // Get user geolocation
   useEffect(() => {
     navigator.geolocation.getCurrentPosition(
       (position) => {
-        console.log("User position:", position);
         setUserLocation({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         });
       },
       (error) => {
-        console.error("Error getting user location:", error);
-        alert(`Location error: ${error.message}`);
+        alert(t("mapPage.errors.locationError", { message: error.message }));
       }
     );
-  }, []);
+  }, [t]);
 
-  // Calculate distance only when both are available
+  // Calculate distance when both coordinates are available
   useEffect(() => {
     if (latLng && userLocation) {
       const dist = calculateDistance(
@@ -60,6 +62,7 @@ const Map = ({ destinationName }) => {
     iconSize: [25, 41],
     iconAnchor: [12, 41],
   });
+
   return (
     <div className="w-full h-[400px]">
       {latLng && userLocation ? (
@@ -72,7 +75,7 @@ const Map = ({ destinationName }) => {
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution="&copy; OpenStreetMap contributors"
+              attribution={t("mapPage.attribution")}
             />
 
             <Marker position={[latLng.lat, latLng.lng]} icon={customIcon}>
@@ -83,18 +86,19 @@ const Map = ({ destinationName }) => {
 
             <Marker position={[userLocation.lat, userLocation.lng]}>
               <Popup>
-                <b>Your Location</b>
+                <b>{t("mapPage.labels.yourLocation")}</b>
               </Popup>
             </Marker>
           </MapContainer>
 
           <div className="mt-2 text-sm text-gray-700">
-            🧭 You are <strong>{distance} km</strong> away from{" "}
+            🧭 {t("mapPage.distanceText.part1")}{" "}
+            <strong>{distance} km</strong> {t("mapPage.distanceText.part2")}{" "}
             <strong>{destinationName}</strong>
           </div>
         </>
       ) : (
-        <p>Loading map and location...</p>
+        <p>{t("mapPage.loading")}</p>
       )}
     </div>
   );

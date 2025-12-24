@@ -5,37 +5,41 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import AskAIModal from "./AskAIModal";
 import axios from "axios";
+import { useTranslation } from "react-i18next";
+
 const SingleCard = ({ packageData }) => {
+  const { t } = useTranslation();
+
   const [showModal, setShowModal] = useState(false);
   const [aiReply, setAIReply] = useState("");
   const [loading, setLoading] = useState(false);
   const [defaultPrompt, setDefaultPrompt] = useState("");
 
   const handleAsk = async (question) => {
+    if (loading) return;
+
     setLoading(true);
     try {
-      const res = await axios({
-        url: `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${
-          import.meta.env.VITE_GEMINI_API_KEY
-        }`,
-        method: "post",
-        data: {
-          contents: [
-            {
-              parts: [{ text: question }],
-            },
-          ],
-        },
+      const res = await axios.post("/api/ai/ask", {
+        question,
+        context: defaultPrompt, // ✅ send context separately
       });
-      const response = res.data.candidates?.[0]?.content?.parts?.[0]?.text;
-      setAIReply(response || "No answer from AI.");
+
+      if (!res.data.success) {
+        setAIReply(t("singleCardPage.ai.error"));
+        return;
+      }
+
+      setAIReply(res.data.response || t("singleCardPage.ai.noAnswer"));
     } catch (error) {
-      console.log(error);
-      setAIReply("Something went wrong!");
+      console.error(error);
+      setAIReply(t("singleCardPage.ai.error"));
     } finally {
       setLoading(false);
     }
   };
+
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -44,19 +48,19 @@ const SingleCard = ({ packageData }) => {
       transition={{ duration: 0.6, ease: "easeOut" }}
       className="w-[260px] h-[360px] mx-auto flex flex-col border rounded-lg overflow-hidden shadow-md bg-white transition-transform duration-300 hover:scale-105"
     >
-      {/* Top Image Section */}
+      {/* -------------------- IMAGE -------------------- */}
       <Link
         to={`/package/${packageData._id}`}
         onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       >
         <img
-          src={`http://localhost:8000/images/${packageData.packageImages[0]}`}
-          alt=""
-          className="w-full h-[140px] object-cover "
+          src={packageData.packageImages[0]}
+          alt={packageData.packageName}
+          className="w-full h-[140px] object-cover"
         />
       </Link>
 
-      {/* Content */}
+      {/* -------------------- CONTENT -------------------- */}
       <div className="p-3 flex flex-col items-start gap-1 flex-1">
         <p className="text-sm text-[#717171]">
           {packageData.packageDestination}
@@ -66,41 +70,55 @@ const SingleCard = ({ packageData }) => {
           {packageData.packageName}
         </h2>
 
-        <p className="text-sm text-[#717171]">{packageData.packageDuration}</p>
-
         {/* Duration */}
-        {(+packageData.packageDays > 0 || +packageData.packageNights > 0) && (
-          <p className="flex text-sm items-center gap-2 text-[#717171]">
-            <FaClock />
-            {+packageData.packageDays > 0 &&
-              (+packageData.packageDays > 1
-                ? packageData.packageDays + " Days"
-                : packageData.packageDays + " Day")}
-            {+packageData.packageDays > 0 &&
-              +packageData.packageNights > 0 &&
-              " - "}
-            {+packageData.packageNights > 0 &&
-              (+packageData.packageNights > 1
-                ? packageData.packageNights + " Nights"
-                : packageData.packageNights + " Night")}
-          </p>
-        )}
+        {(Number(packageData.packageDays) > 0 ||
+          Number(packageData.packageNights) > 0) && (
+            <p className="flex text-sm items-center gap-2 text-[#717171]">
+              <FaClock />
+
+              {Number(packageData.packageDays) > 0 &&
+                (packageData.packageDays > 1
+                  ? `${packageData.packageDays} ${t(
+                    "singleCardPage.duration.days"
+                  )}`
+                  : `${packageData.packageDays} ${t(
+                    "singleCardPage.duration.day"
+                  )}`)}
+
+              {Number(packageData.packageDays) > 0 &&
+                Number(packageData.packageNights) > 0 &&
+                " - "}
+
+              {Number(packageData.packageNights) > 0 &&
+                (packageData.packageNights > 1
+                  ? `${packageData.packageNights} ${t(
+                    "singleCardPage.duration.nights"
+                  )}`
+                  : `${packageData.packageNights} ${t(
+                    "singleCardPage.duration.night"
+                  )}`)}
+            </p>
+          )}
 
         {/* Price */}
         <div className="flex items-center justify-between gap-2 w-full mt-1 text-sm">
-          <span className="text-gray-600">From</span>
-          {packageData.offer && packageData.packageDiscountPrice ? (
+          <span className="text-gray-600">
+            {t("singleCardPage.price.from")}
+          </span>
+
+          {packageData.packageOffer &&
+            packageData.packageDiscountPrice ? (
             <span className="flex gap-2 items-center">
               <span className="line-through text-gray-500">
-                ${packageData.packagePrice}
+                ₹{packageData.packagePrice}
               </span>
               <span className="font-semibold text-green-600">
-                ${packageData.packageDiscountPrice}
+                ₹{packageData.packageDiscountPrice}
               </span>
             </span>
           ) : (
             <span className="font-semibold text-green-600">
-              ${packageData.packagePrice}
+              ₹{packageData.packagePrice}
             </span>
           )}
         </div>
@@ -120,17 +138,33 @@ const SingleCard = ({ packageData }) => {
           </div>
         )}
       </div>
+
+      {/* -------------------- ASK AI BUTTON -------------------- */}
       <button
         className="px-6 py-1 bg-[#EB662B] text-white"
         onClick={() => {
           setShowModal(true);
-          setDefaultPrompt(
-            `Tell me about travel tips and places to visit in ${packageData.packageDestination}`
-          );
+          setDefaultPrompt(`
+Package details:
+Name: ${packageData.packageName}
+Destination(s): ${packageData.packageDestination}
+Duration: ${packageData.packageDays} Days and ${packageData.packageNights} Nights
+Accommodation: ${packageData.packageAccommodation}
+Activities: ${packageData.packageActivities}
+Meals: ${packageData.packageMeals}
+Transportation: ${packageData.packageTransportation}
+Price: ₹${packageData.packagePrice}
+Discounted Price: ${packageData.packageDiscountPrice || "N/A"}
+Offer: ${packageData.packageOffer ? "Yes" : "No"}
+Description: ${packageData.packageDescription}
+`);
         }}
       >
-        Ask AI
+        {t("singleCardPage.askAI")}
       </button>
+
+
+      {/* -------------------- AI MODAL -------------------- */}
       <AskAIModal
         isOpen={showModal}
         onClose={() => setShowModal(false)}
@@ -142,4 +176,5 @@ const SingleCard = ({ packageData }) => {
     </motion.div>
   );
 };
+
 export default SingleCard;

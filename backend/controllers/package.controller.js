@@ -3,6 +3,15 @@ import braintree from "braintree";
 import dotenv from "dotenv";
 import Booking from "../models/booking.model.js";
 dotenv.config();
+import uploadToCloudinary from "../utils/cloudinaryUpload.js";
+import cloudinary from "../config/cloudinary.js";
+
+//helper function for extracting publicId 
+const extractPublicId = (url) => {
+  const parts = url.split("/upload/")[1];
+  const withoutVersion = parts.replace(/^v\d+\//, "");
+  return withoutVersion.substring(0, withoutVersion.lastIndexOf("."));
+};
 
 //create package
 export const createPackage = async (req, res) => {
@@ -22,7 +31,17 @@ export const createPackage = async (req, res) => {
       packageOffer,
     } = req.body;
 
-    const imageFilenames = req.files.map((file) => file.filename);
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).send({
+        success: false,
+        message: "At least one image is required",
+      });
+    }
+
+    const imageFiles = req.files.map((file) => uploadToCloudinary(file.buffer, "Tripify"));
+    const results = await Promise.all(imageFiles);
+    const imageFilenames = results.map((result) => result.secure_url);
+
 
     if (
       !packageName ||
@@ -32,7 +51,7 @@ export const createPackage = async (req, res) => {
       !packageTransportation ||
       !packageMeals ||
       !packageActivities ||
-      !packageOffer === ""
+      !packageOffer
     ) {
       return res.status(200).send({
         success: false,
@@ -181,10 +200,11 @@ export const getPackageData = async (req, res) => {
 //   }
 // };
 
+
 export const updatePackage = async (req, res) => {
   try {
-    console.log(req.params);
     const { id } = req.params;
+
     const {
       packageName,
       packageDescription,
@@ -200,49 +220,62 @@ export const updatePackage = async (req, res) => {
       packageOffer,
     } = req.body;
 
-    const imageFilenames = req.files
-      ? req.files.map((file) => file.filename)
-      : [];
-
     const packageToUpdate = await Package.findById(id);
 
     if (!packageToUpdate) {
-      return res
-        .status(404)
-        .send({ success: false, message: "Package not found" });
+      return res.status(404).send({
+        success: false,
+        message: "Package not found",
+      });
     }
 
-    // Update fields
-    packageToUpdate.packageName = packageName || packageToUpdate.packageName;
+    /* ---------- Upload new images if provided ---------- */
+    let imageUrls = [];
+
+    if (req.files && req.files.length > 0) {
+      const uploadPromises = req.files.map((file) =>
+        uploadToCloudinary(file.buffer, "Tripify")
+      );
+
+      const results = await Promise.all(uploadPromises);
+      imageUrls = results.map((img) => img.secure_url);
+
+      // replace old images with new ones
+      packageToUpdate.packageImages = imageUrls;
+    }
+
+    /* ---------- Update fields safely ---------- */
+    packageToUpdate.packageName =
+      packageName ?? packageToUpdate.packageName;
     packageToUpdate.packageDescription =
-      packageDescription || packageToUpdate.packageDescription;
+      packageDescription ?? packageToUpdate.packageDescription;
     packageToUpdate.packageDestination =
-      packageDestination || packageToUpdate.packageDestination;
-    packageToUpdate.packageDays = packageDays || packageToUpdate.packageDays;
+      packageDestination ?? packageToUpdate.packageDestination;
+    packageToUpdate.packageDays =
+      packageDays ?? packageToUpdate.packageDays;
     packageToUpdate.packageNights =
-      packageNights || packageToUpdate.packageNights;
+      packageNights ?? packageToUpdate.packageNights;
     packageToUpdate.packageAccommodation =
-      packageAccommodation || packageToUpdate.packageAccommodation;
+      packageAccommodation ?? packageToUpdate.packageAccommodation;
     packageToUpdate.packageTransportation =
-      packageTransportation || packageToUpdate.packageTransportation;
-    packageToUpdate.packageMeals = packageMeals || packageToUpdate.packageMeals;
+      packageTransportation ?? packageToUpdate.packageTransportation;
+    packageToUpdate.packageMeals =
+      packageMeals ?? packageToUpdate.packageMeals;
     packageToUpdate.packageActivities =
-      packageActivities || packageToUpdate.packageActivities;
-    packageToUpdate.packagePrice = packagePrice || packageToUpdate.packagePrice;
+      packageActivities ?? packageToUpdate.packageActivities;
+    packageToUpdate.packagePrice =
+      packagePrice ?? packageToUpdate.packagePrice;
     packageToUpdate.packageDiscountPrice =
-      packageDiscountPrice || packageToUpdate.packageDiscountPrice;
-    packageToUpdate.packageOffer = packageOffer || packageToUpdate.packageOffer;
-
-    // Only update images if new ones are uploaded
-    if (imageFilenames.length > 0) {
-      packageToUpdate.packageImages = imageFilenames;
-    }
+      packageDiscountPrice ?? packageToUpdate.packageDiscountPrice;
+    packageToUpdate.packageOffer =
+      packageOffer ?? packageToUpdate.packageOffer;
 
     await packageToUpdate.save();
 
     res.status(200).send({
       success: true,
       message: "Package updated successfully",
+      package: packageToUpdate,
     });
   } catch (error) {
     console.log("Update error:", error);
@@ -253,19 +286,42 @@ export const updatePackage = async (req, res) => {
   }
 };
 
+
 //delete package
 export const deletePackage = async (req, res) => {
   try {
-    const deletePackage = await Package.findByIdAndDelete(req?.params?.id);
+    const pkg = await Package.findById(req.params.id);
+
+    if (!pkg) {
+      return res.status(404).send({
+        success: false,
+        message: "Package not found",
+      });
+    }
+
+    // 🧹 Delete images from Cloudinary
+    if (pkg.packageImages && pkg.packageImages.length > 0) {
+      for (const imageUrl of pkg.packageImages) {
+        const publicId = extractPublicId(imageUrl);
+        await cloudinary.uploader.destroy(publicId);
+      }
+    }
+
+    // 🗑️ Delete package from DB
+    await Package.findByIdAndDelete(req.params.id);
+
     return res.status(200).send({
       success: true,
-      message: "Package Deleted!",
+      message: "Package  deleted successfully",
     });
   } catch (error) {
-    cnsole.log(error);
+    console.error(error);
+    return res.status(500).send({
+      success: false,
+      message: "Error while deleting package",
+    });
   }
 };
-
 //payment gateway api
 //token
 // export const braintreeTokenController = async (req, res) => {

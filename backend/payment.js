@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 const stripe = new Stripe(
-  "sk_test_51RBaMWLxzru9hDfEhO7bcHtPc1e88j28Zix6GqabB9fAbeN1jw2GcUJZGu5p4KQnFe9SWxZeIwDf3uGralhMTfMP00bgHVGoqh"
+  process.env.STRIPE_SECRET_KEY
 );
 
 const payment = async (amount) => {

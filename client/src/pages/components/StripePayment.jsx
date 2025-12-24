@@ -1,111 +1,46 @@
-import axios from "axios";
-import { useState } from "react";
-import { usePaymentInputs } from "react-payment-inputs";
-import images from "react-payment-inputs/images";
-import { Link, useNavigate } from "react-router-dom";
+import React from "react";
 
-const StripePayment = () => {
-  const navigate = useNavigate();
-  const {
-    getCardNumberProps,
-    getExpiryDateProps,
-    getCVCProps,
-    getCardImageProps,
-  } = usePaymentInputs();
+const StripePayment = ({ handleBookPackage }) => {
+  const handleStripe = async () => {
+    handleBookPackage();
 
-  const [card, setCard] = useState({
-    number: "",
-    cvc: "",
-    exp_month: "",
-    exp_year: "",
-  });
+    try {
+      const bookingData = JSON.parse(localStorage.getItem("pendingBooking"));
 
-  const handleNumberChange = (e) => {
-    const value = e.target.value;
-    setCard({ ...card, number: value });
-  };
-  const handleExpiryDateChange = (e) => {
-    const value = e.target.value;
-    const month = value.split("/")[0];
-    const year = value.split("/")[1];
-    setCard({ ...card, exp_month: month, exp_year: year });
-  };
-  const handleCVCChange = (e) => {
-    const value = e.target.value;
-    setCard({ ...card, cvc: value });
-  };
+      if (!bookingData) {
+        console.log("No booking data found");
+        return;
+      }
+      console.log(bookingData);
+      const res = await fetch("http://localhost:8000/payment/create-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: bookingData.totalPrice,
+        }),
+      });
 
-  const submitHandler = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await fetch(`http://localhost:8000/payment/create-payment`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: 1000 }),
-    });
-    const result = await res.json();
 
-    if (result.success && result.url) {
-      window.location.href = result.url; // 👈 Redirect to Stripe Checkout
-    } else {
-      console.log(result.message);
+
+      const data = await res.json();
+
+      if (data.success && data.url) {
+        window.location.href = data.url;
+      } else {
+        console.log(data.message);
+      }
+    } catch (error) {
+      console.log(error);
     }
-  } catch (error) {
-    console.log("Error:", error);
-  }
-};
+  };
+
   return (
-    <div className="flex justify-center items-center  py-6">
-      <div className="bg-white p-6 rounded-lg shadow-md w-full max-w-sm">
-        <h2 className="text-xl font-semibold text-gray-800 text-center mb-4">
-          Payment Details
-        </h2>
-        <form onSubmit={submitHandler} className="space-y-4">
-          <div className="relative mb-4">
-            <input
-              {...getCardNumberProps({
-                onChange: (e) => handleNumberChange(e),
-              })}
-              placeholder="Card Number"
-              required
-              className="w-full p-1 pl-4 pr-12 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            />
-            <svg
-              {...getCardImageProps({ images })}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 w-8 h-5"
-            />
-          </div>
-
-          <div className="flex justify-between items-center mb-4 space-x-4">
-            <input
-              {...getExpiryDateProps({
-                onChange: (e) => handleExpiryDateChange(e),
-              })}
-              placeholder="MM/YY"
-              required
-              className="w-1/2 p-1 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            />
-            <input
-              {...getCVCProps({ onChange: (e) => handleCVCChange(e) })}
-              placeholder="CVC"
-              required
-              maxLength={3}
-              className="w-1/2 p-1 border border-gray-300 rounded-lg text-lg focus:outline-none focus:ring-1 focus:ring-indigo-500"
-            />
-          </div>
-
-          <button type="submit"
-            // onClick={() =>
-            //   (window.location.href =
-            //     "https://dashboard.stripe.com/test/payments")
-            // }
-            className="w-full py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition duration-200"
-          >
-            Pay Now
-          </button>
-        </form>
-      </div>
-    </div>
+    <button
+      onClick={handleStripe}
+      className="p-2 mt-2 rounded bg-[#EB662B] text-white hover:opacity-90 cursor-pointer w-full"
+    >
+      Pay to Book
+    </button>
   );
 };
 

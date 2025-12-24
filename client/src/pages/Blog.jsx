@@ -3,8 +3,10 @@ import { motion } from "framer-motion";
 import blog1 from "../assets/images/b1.png";
 import blog2 from "../assets/images/b2.png";
 import blog3 from "../assets/images/b3.png";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 const Blog = () => {
+  const {t} = useTranslation();
   return (
     <div className="w-full py-16 bg-gray-100">
       <div className="max-w-screen-xl mx-auto px-6">
@@ -14,7 +16,7 @@ const Blog = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1 }}
         >
-          Welcome to Trevo Blog
+          {t("Blog_Welcome")}
         </motion.h1>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -32,15 +34,13 @@ const Blog = () => {
             />
             <div className="p-6">
               <h2 className="text-2xl font-semibold text-[#05073C] mb-3">
-                How to Travel the World
+                {t("Blog_First")}
               </h2>
               <p className="text-lg text-gray-700 mb-6">
-                Discover the best tips, tricks, and secrets on how to travel the
-                world while staying on a budget. Explore new cultures, make
-                unforgettable memories, and visit breathtaking destinations...
+                  {t("Blog_Des1")}
               </p>
               <a href="#" className="text-[#6358DC] font-semibold">
-                Read More →
+                {t("Blog_Read_More")} →
               </a>
             </div>
           </motion.div>
@@ -59,16 +59,14 @@ const Blog = () => {
             />
             <div className="p-6">
               <h2 className="text-2xl font-semibold text-[#05073C] mb-3">
-                The Ultimate Travel Guide to Europe
+                {t("Blog_Second")}
+                
               </h2>
               <p className="text-lg text-gray-700 mb-6">
-                Europe is filled with incredible destinations. From the romantic
-                streets of Paris to the scenic views of the Alps, this guide
-                will help you plan your European adventure with ease and
-                confidence...
+                {t("Blog_Des2")}
               </p>
               <a href="#" className="text-[#6358DC] font-semibold">
-                Read More →
+                {t("Blog_Read_More")} →
               </a>
             </div>
           </motion.div>
@@ -87,16 +85,14 @@ const Blog = () => {
             />
             <div className="p-6">
               <h2 className="text-2xl font-semibold text-[#05073C] mb-3">
-                Budget Travel Tips for Solo Travelers
+                {t("Blog_Third")}
+                
               </h2>
               <p className="text-lg text-gray-700 mb-6">
-                Traveling solo is an incredible experience, but it can also be
-                expensive. In this post, we share budget-friendly tips and
-                tricks to help you travel the world on your own terms without
-                breaking the bank...
+                {t("Blog_Des3")}
               </p>
               <a href="#" className="text-[#6358DC] font-semibold">
-                Read More →
+                {t("Blog_Read_More")} →
               </a>
             </div>
           </motion.div>
@@ -110,11 +106,11 @@ const Blog = () => {
           transition={{ duration: 1 }}
         >
           <h2 className="text-3xl font-semibold text-[#05073C] mb-4">
-            Book Now and Enjoy Movements
+
+             {t("Blog_Head")}
           </h2>
           <p className="text-lg text-gray-600">
-            Stay up-to-date with the latest travel tips, guides, and adventures!
-            Explore the new post below.
+            {t("Blog_Des")}
           </p>
           <Link
             to={"/search"}
@@ -122,7 +118,7 @@ const Blog = () => {
             href="#"
             className="mt-6 inline-block bg-[#EB662B] text-white py-3 px-8 rounded-lg text-lg font-semibold transition duration-300 hover:opacity-90"
           >
-            Lets Explore World
+            {t("Blog_Lets_Explore_World" )}
           </Link>
         </motion.div>
       </div>

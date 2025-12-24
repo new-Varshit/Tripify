@@ -9,38 +9,43 @@ import logo3 from "../../assets/images/logo3.png";
 import logo4 from "../../assets/images/logo4.png";
 import logo5 from "../../assets/images/logo5.png";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+
 const Booking = () => {
+  const { t } = useTranslation();
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
-    handleResize(); // check on load
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
   const steps = [
     {
       id: 1,
       image: destination,
-      title: "Choose Destination",
-      description:
-        "Built Wicket longer admire do barton vanity itself do in it. ",
+      title: t("bookingSectionPage.steps.chooseDestination"),
+      description: t("bookingSectionPage.steps.chooseDestinationDesc"),
     },
     {
       id: 2,
       image: payment,
-      title: "Make Payment",
-      description: "just make your payment and enjoy the trip",
+      title: t("bookingSectionPage.steps.makePayment"),
+      description: t("bookingSectionPage.steps.makePaymentDesc"),
     },
     {
       id: 3,
       image: vehicle,
-      title: "Reach AirPort on Selected Date",
-      description: "Reach airport on selected date and enjoy your trip with us",
+      title: t("bookingSectionPage.steps.reachAirport"),
+      description: t("bookingSectionPage.steps.reachAirportDesc"),
     },
   ];
+
   return (
     <div className="my-16">
+
       {/* Animated Heading */}
       <motion.h4
         className="text-[#DF6951] text-center md:text-start text-lg font-semibold md:text-xl md:font-bold"
@@ -49,7 +54,7 @@ const Booking = () => {
         viewport={{ once: true, amount: 0.5 }}
         transition={{ duration: 0.6 }}
       >
-        Easy and Fast
+        {t("bookingSectionPage.easyFast")}
       </motion.h4>
 
       <motion.h1
@@ -59,10 +64,12 @@ const Booking = () => {
         viewport={{ once: true, amount: 0.5 }}
         transition={{ duration: 0.8 }}
       >
-        Book your next trip in <br /> 3 easy steps
+        {t("bookingSectionPage.mainHeading.line1")} <br />{" "}
+        {t("bookingSectionPage.mainHeading.line2")}
       </motion.h1>
 
       <div className="flex flex-col md:flex-row gap-10 items-center">
+        
         {/* Left Steps Section */}
         <div className="w-full md:w-1/2 px-2">
           {steps.map((step, index) => (
@@ -100,6 +107,7 @@ const Booking = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
         >
           <div className="max-w-[370px] w-full mx-auto h-[300px] bg-white rounded-md flex flex-col items-center px-3 ">
+
             <motion.img
               src={booking_right}
               className="transition-transform hover:scale-105 duration-300 ease-in-out"
@@ -109,28 +117,31 @@ const Booking = () => {
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
             />
+
             <h1 className="text-gray-800 my-4 text-lg font-semibold md:text-xl md:font-bold">
-              Trip To Greece
+              {t("bookingSectionPage.rightCard.tripTitle")}
             </h1>
+
             <div className="flex items-center justify-around gap-3 text-sm text-gray-600">
-              <p>23rd April</p> |<p>Trip to Greece</p>
+              <p>{t("bookingSectionPage.rightCard.date")}</p> |
+              <p>{t("bookingSectionPage.rightCard.tripName")}</p>
             </div>
+
             <div className="flex items-center justify-around gap-5 my-3 text-sm text-gray-700 font-medium">
-              <p>24 people going</p>
-              <p>$2,500</p>
+              <p>{t("bookingSectionPage.rightCard.peopleGoing")}</p>
+              <p>{t("bookingSectionPage.rightCard.price")}</p>
             </div>
+
           </div>
         </motion.div>
       </div>
 
-      {/* logo section */}
+      {/* Logo section */}
       <div className="flex flex-wrap items-center justify-center gap-5 my-10">
         {[logo1, logo2, logo3, logo4, logo5].map((logo, index) =>
           isMobile ? (
-            // No animation on mobile
             <img key={index} src={logo} alt="" />
           ) : (
-            // Animated on md and up
             <motion.img
               key={index}
               src={logo}
@@ -150,4 +161,5 @@ const Booking = () => {
     </div>
   );
 };
+
 export default Booking;

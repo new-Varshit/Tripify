@@ -10,7 +10,7 @@ const Offers = ({ packageData }) => {
         >
           <img
             className="rounded-full w-20 h-20"
-            src={`http://localhost:8000/images/${packageData.packageImages[0]}`}
+            src={`${packageData.packageImages[0]}`}
             alt=""
           />
         </Link>
@@ -19,15 +19,15 @@ const Offers = ({ packageData }) => {
         {packageData.offer && packageData.packageDiscountPrice ? (
           <p className=" text-sm">
             <span className="line-through text-gray-700">
-              ${packageData.packagePrice}
+              ₹{packageData.packagePrice}
             </span>
             -
             <span className="text-sm ">
-              ${packageData.packageDiscountPrice}
+              ₹{packageData.packageDiscountPrice}
             </span>
           </p>
         ) : (
-          <p className="text-sm">${packageData.packagePrice}</p>
+          <p className="text-sm">₹{packageData.packagePrice}</p>
         )}
       </p>
       <div>
