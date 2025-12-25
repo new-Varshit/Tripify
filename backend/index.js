@@ -25,10 +25,11 @@ dotenv.config({ path: path.join(__dirname, ".env") });
 const app = express();
 
 connectDB();
+console.log("SERVER_URL:", process.env.SERVER_URL);
 
 app.use(
   cors({
-    origin: [process.env.SERVER_URL,
+    origin: ["http://localhost:5173",
        "https://tripify-kappa.vercel.app"
     ],
     credentials: true,
