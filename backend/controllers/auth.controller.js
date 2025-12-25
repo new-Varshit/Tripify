@@ -79,13 +79,17 @@ export const loginController = async (req, res) => {
       });
     }
 
-    const token = await jwt.sign({ id: validUser._id }, "bfuiwrht7895t5uith", {
+    const token = await jwt.sign({ id: validUser._id }, process.env.JWT_SECRET, {
       expiresIn: "4d",
     });
     const { password: pass, ...rest } = validUser._doc; //deselcting password to send user(this will send all data accept password)
+    const isProd = process.env.NODE_ENV === "production";
+
     res
       .cookie("X_TTMS_access_token", token, {
         httpOnly: true,
+        secure: isProd,                 // 🔴 REQUIRED in production
+        sameSite: isProd ? "none" : "lax", // 🔴 REQUIRED for cross-site
         maxAge: 4 * 24 * 60 * 60 * 1000,
       })
       .status(200)
