@@ -132,25 +132,28 @@ const App = () => {
 
 
   const handleAsk = async (question) => {
-  if (loading) return;
+    if (loading) return;
 
-  setLoading(true);
-  try {
-    const res = await axios.post("/api/ai/ask", { question });
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/api/ai/ask`,
+        { question },
+        { withCredentials: true }
+      );
+      if (!res.data.success) {
+        setAIReply("AI is currently unavailable. Please try again.");
+        return;
+      }
 
-    if (!res.data.success) {
-      setAIReply("AI is currently unavailable. Please try again.");
-      return;
+      setAIReply(res.data.response || "No answer from AI.");
+    } catch (error) {
+      console.error(error);
+      setAIReply("Something went wrong while contacting Tripify AI!");
+    } finally {
+      setLoading(false);
     }
-
-    setAIReply(res.data.response || "No answer from AI.");
-  } catch (error) {
-    console.error(error);
-    setAIReply("Something went wrong while contacting Tripify AI!");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
 
 

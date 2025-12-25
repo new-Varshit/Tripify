@@ -109,7 +109,7 @@ const AddPackages = () => {
     try {
       setLoading(true);
       const res = await axios.post(
-        `http://localhost:8000/api/package/create-package`,
+        `${import.meta.env.VITE_API_URL}/api/package/create-package`,
         data,
         {
           headers: {

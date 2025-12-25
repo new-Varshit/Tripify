@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
 import loginImage from "../assets/images/login.png";
 import { toast } from "react-toastify";
+import { apiFetch } from "../services/api";
 import { useTranslation } from "react-i18next";
 
 const Signup = () => {
@@ -60,23 +60,31 @@ const Signup = () => {
     }
 
     try {
-      const res = await axios.post(`/api/auth/signup`, formData);
-      if (res?.data?.success) {
-        toast.success(res?.data?.message);
+      const res = await apiFetch("/api/auth/signup", {
+        method: "POST",
+        body: JSON.stringify(formData),
+      });
+
+      const data = await res.json();
+
+      if (data?.success) {
+        toast.success(data?.message);
         navigate("/login");
       } else {
-        toast.error(res?.data?.message);
+        toast.error(data?.message);
       }
     } catch (error) {
       console.log(error);
+      toast.error("Something went wrong");
     }
+
   };
 
   return (
     <div className="w-full mx-auto h-screen flex justify-center items-center bg-[#FFF1DA]">
       <div className="w-full min-h-screen flex items-center justify-center bg-[#FFF1DA]">
         <div className="w-[90%] bg-white md:w-[60%] mx-auto flex flex-col rounded-md gap-6">
-          
+
           {/* Heading */}
           <h1 className="text-center text-lg mt-6 font-medium md:text-3xl md:font-bold text-gray-800">
             {t("signup.heading")} <span className="text-[#FF7D68]">Tripify</span>
@@ -125,13 +133,12 @@ const Signup = () => {
 
                 {passwordStrength && (
                   <p
-                    className={`mt-2 text-sm ${
-                      passwordStrength === "Weak"
+                    className={`mt-2 text-sm ${passwordStrength === "Weak"
                         ? "text-red-500"
                         : passwordStrength === "Medium"
-                        ? "text-yellow-500"
-                        : "text-green-500"
-                    }`}
+                          ? "text-yellow-500"
+                          : "text-green-500"
+                      }`}
                   >
                     {t(`signup.password_${passwordStrength.toLowerCase()}`)}
                   </p>

@@ -96,7 +96,7 @@ const UpdateProfile = () => {
       }
 
       const res = await axios.post(
-        `/api/user/update/${currentUser._id}`,
+        `${import.meta.env.VITE_API_URL}/api/user/update/${currentUser._id}`,
         updatedForm
       );
 

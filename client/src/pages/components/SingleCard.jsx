@@ -20,7 +20,7 @@ const SingleCard = ({ packageData }) => {
 
     setLoading(true);
     try {
-      const res = await axios.post("/api/ai/ask", {
+      const res = await axios.post(`${import.meta.env.VITE_API_URL}/api/ai/ask`, {
         question,
         context: defaultPrompt, // ✅ send context separately
       });
