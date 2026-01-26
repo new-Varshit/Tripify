@@ -31,6 +31,7 @@ export const createPackage = async (req, res) => {
       packageOffer,
     } = req.body;
 
+
     if (!req.files || req.files.length === 0) {
       return res.status(400).send({
         success: false,
@@ -41,6 +42,12 @@ export const createPackage = async (req, res) => {
     const imageFiles = req.files.map((file) => uploadToCloudinary(file.buffer, "Tripify"));
     const results = await Promise.all(imageFiles);
     const imageFilenames = results.map((result) => result.secure_url);
+
+    const price = Number(packagePrice);
+    const discount = Number(packageDiscountPrice);
+    const days = Number(packageDays);
+    const nights = Number(packageNights);
+    const offer = packageOffer === "true"; // because booleans also come as strings
 
 
     if (
@@ -53,25 +60,26 @@ export const createPackage = async (req, res) => {
       !packageActivities ||
       !packageOffer
     ) {
-      return res.status(200).send({
+      return res.status(400).send({
         success: false,
         message: "All fields are required!",
       });
     }
-    if (packagePrice < packageDiscountPrice) {
-      return res.status(200).send({
+
+    if (price < discount) {
+      return res.status(400).send({
         success: false,
         message: "Regular price should be greater than discount price!",
       });
     }
-    if (packagePrice <= 0 || packageDiscountPrice < 0) {
-      return res.status(200).send({
+    if (price <= 0 || discount < 0) {
+      return res.status(400).send({
         success: false,
         message: "Price should be greater than 0!",
       });
     }
-    if (packageDays <= 0 && packageNights <= 0) {
-      return res.status(200).send({
+    if (days <= 0 && nights <= 0) {
+      return res.status(400).send({
         success: false,
         message: "Provide days and nights!",
       });
@@ -102,7 +110,7 @@ export const createPackage = async (req, res) => {
     else {
       return res.status(500).send({
         success: false,
-        message: "Soemthing went wrong",
+        message: "Something went wrong",
       });
     }
   } catch (error) {

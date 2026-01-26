@@ -118,6 +118,7 @@ const AddPackages = () => {
           withCredentials: true,
         }
       );
+        console.log('res',res);
 
       if (!res.data.success) {
         setError(res.data.message);

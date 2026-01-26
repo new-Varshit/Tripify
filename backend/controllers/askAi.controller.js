@@ -19,6 +19,8 @@ export const askAi = async (req, res) => {
       ? `${context}\n\nUser question: ${question}`
       : `User question: ${question}`;
 
+       console.log('finalPrompt',finalPrompt);
+
     const completion = await openrouter.chat.send({
       model: "nex-agi/deepseek-v3.1-nex-n1:free",
       messages: [
@@ -34,6 +36,8 @@ export const askAi = async (req, res) => {
       ],
       stream: false, // 🚀 faster response
     });
+
+     console.log('completion',completion);
 
     const response =
       completion.choices?.[0]?.message?.content || "No response from AI.";
