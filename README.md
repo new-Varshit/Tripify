@@ -6,7 +6,6 @@ Tripify is a comprehensive full-stack travel platform that leverages artificial 
 
 
 
-🌐 **[View Live Application](https://tripify-kappa.vercel.app)**
 
 
 ## 🖼 Screenshots
@@ -165,7 +164,6 @@ npm run dev
 ```
 
 ### 4. Access the Application
-- **Live Demo:** [https://tripify-kappa.vercel.app](https://tripify-kappa.vercel.app)
 - **Local Frontend:** `http://localhost:5173`
 - **Local Backend API:** `http://localhost:8000/api`
 
